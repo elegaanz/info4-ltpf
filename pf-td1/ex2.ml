@@ -22,3 +22,16 @@ let aire_cercle = fun r -> pi *. r *. r
 *)
 let aire_triangle a h = failwith "Flemme de trouver l'équation déso"
 
+(* Bonus : un seul type pour toutes les figures géométriques *)
+
+type geometrie =
+   | Carre of float
+   | Rectangle of float * float
+   | Cercle of float
+   | Triangle of float * float
+
+let aire g = match g with
+| Carre(a) -> aire_carre a
+| Rectangle(a, b) -> aire_rectangle a b
+| Cercle(r) -> aire_cercle r
+| Triangle(a, h) -> aire_triangle a h
