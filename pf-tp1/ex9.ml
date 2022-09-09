@@ -1,0 +1,1 @@
+let min2entiers a b = if a < b then a else b
