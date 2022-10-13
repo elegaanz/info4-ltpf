@@ -21,7 +21,6 @@ le raisonnement formalisé en Coq, soit avant, soit a posteriori.
     Cst (pour les naturels), Apl et Amu pour l'addition et la multiplication *)
 
 Inductive aexp : Set :=
-(* à compléter *)
 | Cst : nat -> aexp
 | Add : aexp -> aexp -> aexp
 | Mul : aexp -> aexp -> aexp
@@ -73,9 +72,9 @@ Fixpoint nbf (a:aexp) :=
 
 Definition categorise (a:aexp) :=
   match a with
-  | Cst _ => 1
-  | Add _ _ => 2
-  | Mul _ _ => 3
+  | Cst _ => Cst 1
+  | Add _ _ => Cst 2
+  | Mul _ _ => Cst 3
   end.
 
 (** Démontrer que le résultat de la fonction précédente
@@ -83,11 +82,19 @@ Definition categorise (a:aexp) :=
     Raisonner par cas en utilisant la tactique destruct.
  *)
 
-(*Lemma nbf_cat : forall a, nbf (categorise a) = 1.
+Lemma nbf_cat : forall a, nbf (categorise a) = 1.
 Proof.
-(* à compléter *)
-
-Admitted.*)
+  intros.
+  induction a as
+    [ n
+    | a Ha b Hb
+    | a Ha b Hb ].
+  cbn [categorise].
+  cbn [nbf].
+  reflexivity.
+  cbn [categorise nbf]. reflexivity.
+  cbn [categorise nbf]. reflexivity.
+Qed.
 
 (** Nombre d'opérateurs *)
 
@@ -114,9 +121,9 @@ Proof.
   induction a as [ (*Cst*) n
                  | (*Apl*) e1 Hrec_e1 e2 Hrec_e2
                  | (*Amu*) e1 Hrec_e1 e2 Hrec_e2 ].
-                 simpl. reflexivity.
-                 simpl. rewrite Hrec_e1. rewrite Hrec_e2. rewrite add_assoc. ring.
-                 simpl. rewrite Hrec_e1. rewrite Hrec_e2. rewrite add_assoc. ring.
+                 - simpl. reflexivity.
+                 - simpl. rewrite Hrec_e1. rewrite Hrec_e2. rewrite add_assoc. ring.
+                 - simpl. rewrite Hrec_e1. rewrite Hrec_e2. rewrite add_assoc. ring.
 Qed.
 
 (** Transformation d'expressions *)
@@ -131,12 +138,14 @@ Fixpoint transform (a:aexp) :=
   match a with
   | Cst x => Cst 1
   | Add a b | Mul a b => Add (transform a) (transform b)
-end.
+  end.
 
 (** Évaluer la fonction transform sur les expressions exp_1 et exp_2 *)
 
+
 Compute transform exp_1.
 Compute transform exp_2.
+
 (** Montrer maintenant que l'évaluation de transform e donne le nombre
  * de feuilles de e (nbf e). *)
 
@@ -159,6 +168,13 @@ Definition simpl0 (a:aexp) :=
   | Mul (Cst 0) a => Cst 0
   | _ => a
   end.
+
+(* ------------------------------------------------------------------------------- *)
+(*                     LΑ SUITE EST FACULTATIVE POUR LE DM.                        *)
+(*                                                                                 *)
+(* Vous êtes bien sûr encouragés à la faire si vous êtes à l'aise avec ce qui a    *)
+(* été vu jusqu'ici.                                                               *)
+(* ------------------------------------------------------------------------------- *)
 
 (* Prouver que simpl0 préserve le résultat de l'évaluation *)
 
@@ -194,13 +210,14 @@ Fixpoint simpl_rec (a:aexp) := match a with
   | Mul a b => simpl0 (Mul (simpl_rec a) (simpl_rec b))
   | x => simpl0 x
 end.
+
 (* Prouver que simpl_rec préserve l'évaluation des expressions *)
 
 Lemma eval_simpl_rec: forall a, eval(simpl_rec a) = eval a.
 Proof.
   intros.
-  induction a as [ n | a Ha b Hb | a Ha b Hb ].
-  cbn [eval simpl_rec simpl0]. reflexivity.
-  apply Ha.
-Admitted.
-
+  induction a.
+  - cbn [simpl_rec simpl0]. reflexivity.
+  - cbn [simpl_rec]. rewrite eval_simpl0. cbn [eval]. rewrite IHa1. rewrite IHa2. reflexivity.
+  - cbn [simpl_rec]. rewrite eval_simpl0. cbn [eval]. rewrite IHa1. rewrite IHa2. reflexivity.
+Qed.

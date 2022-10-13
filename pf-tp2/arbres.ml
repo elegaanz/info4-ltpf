@@ -167,3 +167,34 @@ let () =
   let assert_suppr n = assert (abr_test |> abr_suppr n |> abr_mem n |> not) in
   assert_suppr 2;
   assert_suppr 5
+
+let rec abr_compare a b = match a with
+| Leaf -> b = Leaf
+| Node(x, g, d) ->
+    try
+      let (bg, bd) = abr_split x b in
+      abr_compare g bg && abr_compare d bd
+    with Failure _ -> false
+
+let () =
+    assert (abr_compare Leaf Leaf);
+    assert (not @@ abr_compare Leaf (Node(0, Leaf, Leaf)));
+    let a = (Node(
+      4,
+      Node(0, Leaf, Leaf),
+      Node(7,
+        Node(
+          2,
+          Leaf,
+          Node(5, Leaf, Leaf)
+        ),
+        Leaf
+      )
+    )) in
+    assert (abr_verif a);
+    assert (abr_compare (abr_insert_all Leaf [2; 7]) (Node(
+      2,
+      Leaf,
+      Node(7, Leaf, Leaf)
+    )));
+    assert (abr_compare (abr_insert_all Leaf [0; 5; 7; 4; 2]) a)
