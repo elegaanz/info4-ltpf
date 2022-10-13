@@ -201,15 +201,15 @@ Qed.
     sur laquelle porte la récurrence *)
 Lemma eq_eqnatb : forall n1 n2, eqnatb n1 n2 = true -> n1 = n2.
 Proof.
-  intros.
+  intros n1.
   induction n1.
-  - destruct n2.
+  - intro n2. destruct n2.
     + reflexivity.
-    + cbn [eqnatb] in H. discriminate.
-  - induction n2.
-    + cbn [eqnatb] in H. discriminate.
-    + give_up.
-Admitted.
+    + cbn [eqnatb]. intros. symmetry in H. apply true_false_eg. exact H.
+  - intro n2. induction n2.
+    + cbn [eqnatb]. intros. symmetry in H. apply true_false_eg. exact H.
+    + intros. cbn [eqnatb] in H. apply IHn1 in H. apply f_equal. exact H.
+Qed.
 
 (** ** 2.3 Équivalence, tactique split *)
 
