@@ -250,8 +250,8 @@ Lemma even_plus : forall n m, even n -> even m -> even (n + m).
 Proof.
   intros n m evn evm.
   induction evn.
-  - simpl. apply evm.
-  - simpl. apply E2. apply IHevn.
+  - apply evm.
+  - apply E2. apply IHevn.
 Qed.
 
 (** Exercice facultatif :
@@ -259,11 +259,11 @@ Qed.
 
 Require Import Arith.
 
-Fail Fixpoint fct_even_plus n m (evn : even n) (evm : even m) : even (n + m) :=
-    match evn with
-    | E0 => eq_refl m (Nat.add_0_l m)
-    | E2 n evn' => E2
-    end.
+Fixpoint fct_even_plus n m (evn : even n) (evm : even m) : even (n + m) :=
+  match evn with
+    | E0 => evm
+    | E2 n' Ihn' => E2 (n' + m) (fct_even_plus n' m Ihn' evm)
+  end.
 
 (* Les multiples de 4 sont pairs *)
 Inductive mul4 : nat -> Prop :=
