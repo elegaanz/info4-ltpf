@@ -148,22 +148,22 @@ type token =
 
 let reco_pareng = fun chaine ->
     match chaine with
-    | '(' :: suite -> (ParentG, suite)
+    | '(' :: suite -> (ParenG, suite)
     | _ -> raise Echec
 
 let reco_parend = fun chaine ->
     match chaine with
-    | ')' :: suite -> (ParentG, suite)
+    | ')' :: suite -> (ParenD, suite)
     | _ -> raise Echec
 
 let reco_noir = fun chaine ->
     match chaine with
-    | 'n' :: 'o' :: 'i' :: 'r' :: suite -> (ParentG, suite)
+    | 'n' :: 'o' :: 'i' :: 'r' :: suite -> (NoirT, suite)
     | _ -> raise Echec
 
 let reco_blanc = fun chaine ->
     match chaine with
-    | 'b' :: 'l' :: 'a' :: 'n' :: 'c' :: suite -> (ParentG, suite)
+    | 'b' :: 'l' :: 'a' :: 'n' :: 'c' :: suite -> (BlancT, suite)
     | _ -> raise Echec
 
 (* On considère qu'on a un analyseur lexical pour les entiers 
@@ -189,7 +189,8 @@ let token_here = fun chaine ->
     with Echec -> try
         reco_noir chaine
     with Echec ->
-        reco_int chaine
+        let (i, reste) = parse_int chaine in
+        (Int i, reste)
 ```
 
 > Écrire ensuite une fonction espaces qui aspire rend une liste de caractères privées des caractères d’espacement en préfixe de cette liste,

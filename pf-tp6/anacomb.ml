@@ -114,3 +114,15 @@ let star_pipe_L2R (a : ('r -> 'r, 'term) ranalist) : ('r -> 'r, 'term) ranalist 
 
 let star_L2R (r0 : 'r) (a : ('r -> 'r, 'term) ranalist) : ('r, 'term) ranalist =
   star_pipe_L2R a ++> fun f -> epsilon_res (r0 |> f)
+
+
+let token_here =
+    reco_pareng +|
+    reco_parend +|
+    reco_blanc  +|
+    reco_noir   +|
+    reco_int
+
+let next_token = aspi_espace -+> token_here
+
+let tokens_connect6 = star_list next_token
